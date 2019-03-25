@@ -93,7 +93,30 @@ class LLDPDU:
         An LLDPDU is complete when it includes at least the mandatory TLVs (Chassis ID, Port ID, TTL).
         """
         # TODO: Implement
-        return NotImplemented
+
+        # Check length (quicker than checking if every mandatory TLV is there)
+        if self.__len__() < 4:
+            return False
+
+        #Check for ChassisID
+        if self.__getitem__(0).get_type() != TLV.Type.CHASSIS_ID:
+            return False
+
+        # Check PortID position
+        if self.__getitem__(1).get_type() != TLV.Type.PORT_ID:
+            return False
+
+        # Check TTL position
+        if self.__getitem__(2).get_type() != TLV.Type.TTL:
+            return False
+
+        # Check last TLV to be the EoLLDPDU
+        if self.__getitem__(self.__len__()) != TLV.Type.END_OF_LLDPDU:
+            return False
+
+        return True
+        # DONE    
+
 
     @staticmethod
     def from_bytes(data: bytes):
