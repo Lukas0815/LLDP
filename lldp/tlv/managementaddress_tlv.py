@@ -125,7 +125,10 @@ class ManagementAddressTLV(TLV):
         See `TLV.__len__()` for more information.
         """
         # TODO: Implement
-        return NotImplemented
+
+        # Note: Only includes length of Address?!
+        return len(self.value.packed())
+        # DONE
 
     def __repr__(self):
         """Return a printable representation of the TLV object.

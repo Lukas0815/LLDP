@@ -137,7 +137,20 @@ class ChassisIdTLV(TLV):
         See `TLV.__len__()` for more information.
         """
         # TODO: Implement
+        # Note: This does not include subtype length
+
+        if (self.subtype == 4):
+            # Case value is Mac: Since MAC-Address is given in raw bytes this should work
+            return len(self.value)
+        elif self.subtype == 5:
+            # case value is Network Address: Since those are also given in raw bytes this should work 
+            # regardless of the type => One might merch this with subtype == 4 or distinguish between Ipv4 and Ipv6 and give it statically
+            return len(self.value)
+        else:
+            #Case value is a string
+            return len(self.value.encode())     #Not sure if this always works... Internet says this does give size of string in bytes!
         return NotImplemented
+        #DONE
 
     def __repr__(self):
         """Return a printable representation of the TLV object.
@@ -145,7 +158,7 @@ class ChassisIdTLV(TLV):
         See `TLV.__repr__()` for more information.
         """
         # TODO: Implement
-        return "ChassisIdTLV(" + repr(self.subtype.NETWORK_ADDRESS) + ", " + repr(self.value) + ")"
+        return "ChassisIdTLV(" + repr(self.subtype) + ", " + repr(self.value) + ")"
         # DONE
 
     @staticmethod

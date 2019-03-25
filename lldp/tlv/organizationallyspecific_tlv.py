@@ -64,7 +64,10 @@ class OrganizationallySpecificTLV(TLV):
         See `TLV.__len__()` for more information.
         """
         # TODO: Implement
-        return NotImplemented
+        # Note: Probably horribly wrong
+        return len(self.value.to_bytes())
+        # DONE
+
 
     def __repr__(self):
         """Return a printable representation of the TLV object.

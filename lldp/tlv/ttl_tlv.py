@@ -47,7 +47,8 @@ class TTLTLV(TLV):
         See `TLV.__len__()` for more information.
         """
         # TODO: Implement
-        return NotImplemented
+        #return 2
+        return len(self.value.to_bytes())
 
     def __repr__(self):
         """Return a printable representation of the TLV object.

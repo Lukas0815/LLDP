@@ -107,7 +107,8 @@ class SystemCapabilitiesTLV(TLV):
         See `TLV.__len__()` for more information.
         """
         # TODO: Implement
-        return NotImplemented
+        return 4
+        # DONE
 
     def __repr__(self):
         """Return a printable representation of the TLV object.

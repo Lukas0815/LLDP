@@ -133,6 +133,19 @@ class PortIdTLV(TLV):
         See `TLV.__len__()` for more information.
         """
         # TODO: Implement
+        # Note: This does not include subtype length
+
+        if (self.subtype == 3):
+            # Case value is Mac: Since MAC-Address is given in raw bytes this should work
+            return len(self.value)
+        elif self.subtype == 4:
+            # case value is Network Address: Since those are also given in raw bytes this should work 
+            # regardless of the type => One might merch this with subtype == 4
+            return len(self.value)
+        else:
+            #Case value is a string
+            # See also chassisid_tlv
+            return len(self.value.encode())     #Not sure if this always works... Internet says this does give size of string in bytes!
         return NotImplemented
 
     def __repr__(self):
