@@ -103,10 +103,11 @@ class ManagementAddressTLV(TLV):
             oid (bytes): The OID. See above
         """
         # TODO: Implement
-        self.type = NotImplemented
-        self.subtype = NotImplemented
-        self.value = NotImplemented
-        self.oid = NotImplemented
+        self.type = TLV.Type.MANAGEMENT_ADDRESS
+        self.subtype = ifsubtype
+        self.value = address
+        self.oid = oid
+        # DONE
 
     def __bytes__(self):
         """Return the byte representation of the TLV.

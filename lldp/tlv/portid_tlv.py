@@ -108,9 +108,14 @@ class PortIdTLV(TLV):
                 Otherwise       -> str
         """
         # TODO: Implement
-        self.type = NotImplemented
-        self.subtype = NotImplemented
-        self.value = NotImplemented
+        # self.type = NotImplemented
+        # self.subtype = NotImplemented
+        # self.value = NotImplemented
+
+        self.type = TLV.Type.PORT_ID
+        self.subtype = subtype
+        self.value = id
+        #DONE
 
     def __bytes__(self):
         """Return the byte representation of the TLV.

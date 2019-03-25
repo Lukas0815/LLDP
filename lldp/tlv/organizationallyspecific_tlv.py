@@ -42,10 +42,11 @@ class OrganizationallySpecificTLV(TLV):
             value (any): The value
         """
         # TODO: Implement
-        self.type = NotImplemented
-        self.oui = NotImplemented
-        self.subtype = NotImplemented
-        self.value = NotImplemented
+        self.type = TLV.Type.ORGANIZATIONALLY_SPECIFIC
+        self.oui = oui
+        self.subtype = subtype
+        self.value = value
+        # DONE
 
     def __bytes__(self):
         """Return the byte representation of the TLV.

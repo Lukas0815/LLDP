@@ -88,7 +88,7 @@ class SystemCapabilitiesTLV(TLV):
             enabled (int): Bitmap of enabled capabilities
         """
         # TODO: Implement
-        self.type = NotImplemented
+        self.type = TLV.Type.SYSTEM_CAPABILITIES
         self.value = NotImplemented
 
     def __bytes__(self):

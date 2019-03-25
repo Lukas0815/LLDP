@@ -28,8 +28,9 @@ class PortDescriptionTLV(TLV):
 
     def __init__(self, description: str):
         # TODO: Implement
-        self.type = NotImplemented
-        self.value = NotImplemented
+        self.type = TLV.Type.PORT_DESCRIPTION
+        self.value = description
+        # DONE
 
     def __bytes__(self):
         """Return the byte representation of the TLV.

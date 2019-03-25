@@ -112,9 +112,14 @@ class ChassisIdTLV(TLV):
                 Otherwise       -> str
         """
         # TODO: Implement
-        self.type = NotImplemented
-        self.subtype = NotImplemented
-        self.value = NotImplemented
+        # self.type = NotImplemented
+        # self.subtype = NotImplemented
+        # self.value = NotImplemented
+        
+        self.type = TLV.Type.CHASSIS_ID
+        self.subtype = subtype
+        self.value = id
+        # DONE
 
     def __bytes__(self):
         """Return the byte representation of the TLV.
