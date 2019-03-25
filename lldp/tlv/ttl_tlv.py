@@ -28,8 +28,8 @@ class TTLTLV(TLV):
 
     def __init__(self, ttl: int):
         # TODO: Implement
-        self.type = NotImplemented
-        self.value = NotImplemented
+        self.type = TLV.Type.TTL
+        self.value = ttl
 
     def __bytes__(self):
         """Return the byte representation of the TLV.
@@ -55,7 +55,8 @@ class TTLTLV(TLV):
         See `TLV.__repr__()` for more information.
         """
         # TODO: Implement
-        return NotImplemented
+        return "TtlTLV(" + repr(self.value) + ")"
+        # DONE
 
     @staticmethod
     def from_bytes(data: TLV.ByteType):

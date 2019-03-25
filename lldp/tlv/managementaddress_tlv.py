@@ -133,7 +133,7 @@ class ManagementAddressTLV(TLV):
         See `TLV.__repr__()` for more information.
         """
         # TODO: Implement
-        return NotImplemented
+        return "ManagementAddressTLV(" + repr(self.subtype) + ", " + repr(self.value) + ", " + repr(self.oid) + ")"
 
     @staticmethod
     def from_bytes(data: TLV.ByteType):

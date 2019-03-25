@@ -72,7 +72,8 @@ class OrganizationallySpecificTLV(TLV):
         See `TLV.__repr__()` for more information.
         """
         # TODO: Implement
-        return NotImplemented
+        return "OrganizationallySpecificTLV(" + repr(self.oui) + ", " + repr(self.subtype) + ", " + repr(self.value) + ")"
+        # DONE
 
     @staticmethod
     def from_bytes(data: TLV.ByteType):

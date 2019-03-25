@@ -145,7 +145,8 @@ class ChassisIdTLV(TLV):
         See `TLV.__repr__()` for more information.
         """
         # TODO: Implement
-        return NotImplemented
+        return "ChassisIdTLV(" + repr(self.subtype.NETWORK_ADDRESS) + ", " + repr(self.value) + ")"
+        # DONE
 
     @staticmethod
     def from_bytes(data: TLV.ByteType):

@@ -141,7 +141,8 @@ class PortIdTLV(TLV):
         See `TLV.__repr__()` for more information.
         """
         # TODO: Implement
-        return NotImplemented
+        return "PortIdTLV(" + repr(self.subtype) + ", " + repr(self.value) + ")"
+        # DONE
 
     @staticmethod
     def from_bytes(data: TLV.ByteType):
