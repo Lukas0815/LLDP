@@ -60,6 +60,30 @@ class LLDPDU:
         """
 
         # TODO: Implement error checks
+        
+        # Check if already EoLLDPDU regardless of Type of tlv
+        if self.__getitem__(self.__len__()).get_type() == TLV.Type.END_OF_LLDPDU:
+            raise ValueError
+        
+        # Checks for ChassisID
+        if tlv.get_type() == TLV.Type.CHASSIS_ID:
+            # Trying to add ChassisID but not first item to be added? WAIT, thats illegal
+            if self.__len__() != 0:
+                raise ValueError
+        
+        # Checks for PortID
+        if tlv.get_type() == TLV.Type.PORT_ID:
+            # PortID must be second item in LLDPDU
+            if self.__len__() != 1:
+                raise ValueError
+        
+        # Checks for TTL
+        if tlv.get_type() == TLV.Type.TTL:
+            # TTL must be third item in LLDPDU
+            if self.__len__() != 2:
+                raise ValueError
+
+        # DONE
 
         self.__tlvs.append(tlv)
 
