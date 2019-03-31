@@ -107,6 +107,8 @@ class ManagementAddressTLV(TLV):
         self.subtype = ifsubtype
         self.value = address
         self.oid = oid
+
+        self.ifnmbr = interface_number
         # DONE
 
     def __bytes__(self):
@@ -116,7 +118,13 @@ class ManagementAddressTLV(TLV):
         See `TLV.__bytes__()` for more information.
         """
         # TODO: Implement
-        return NotImplemented
+        manageAddressStringLength = hex(len(self.value.packed()))
+        mAddressSubtype = '0x1' # Placeholder
+        # NOTE: Add str() to hex() ?
+        x = '1' + str(manageAddressStringLength) + mAddressSubtype + self.value.packed() + hex(self.subtype.value()) + hex(self.ifnmbr) + hex(len(self.oid)) + self.oid.hex()
+
+        return bytes.fromhex(x)
+        # DONE
 
     def __len__(self):
         """Return the length of the TLV value.

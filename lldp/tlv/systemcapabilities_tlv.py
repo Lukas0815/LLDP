@@ -98,7 +98,9 @@ class SystemCapabilitiesTLV(TLV):
         See `TLV.__bytes__()` for more information.
         """
         # TODO: Implement
-        return NotImplemented
+        x = '7' + str(hex(self.__len__())) 
+        return bytes.fromhex(x)
+        # UNFINISHED
 
     def __len__(self):
         """Return the length of the TLV value.

@@ -127,8 +127,24 @@ class ChassisIdTLV(TLV):
         This method must return bytes. Returning a bytearray will raise a TypeError.
         See `TLV.__bytes__()` for more information.
         """
+        
         # TODO: Implement
-        return NotImplemented
+        hexvaluestr = ''
+
+        if self.subtype == ChassisIdTLV.Subtype.MAC_ADDRESS:
+            # value is MAC in bytes
+            hexvaluestr = self.value.hex()
+        elif self.subtype == ChassisIdTLV.Subtype.NETWORK_ADDRESS:
+            # value is ipaddress which supposedly is encoded in raw bytes
+            hexvaluestr = self.value.hex()
+        else:
+            # value is a string so encode it
+            hexvaluestr = str(self.value.encode())
+
+        tlvhexstr = '1' + str(hex(self.__len__())) + hexvaluestr
+    
+        return bytes.fromhex(tlvhexstr)
+        # DONE
 
     def __len__(self):
         """Return the length of the TLV value.
@@ -139,10 +155,10 @@ class ChassisIdTLV(TLV):
         # TODO: Implement
         # Note: This does not include subtype length
 
-        if (self.subtype == 4):
+        if (self.subtype == ChassisIdTLV.Subtype.MAC_ADDRESS):
             # Case value is Mac: Since MAC-Address is given in raw bytes this should work
             return len(self.value)
-        elif self.subtype == 5:
+        elif self.subtype == ChassisIdTLV.Subtype.NETWORK_ADDRESS:
             # case value is Network Address: Since those are also given in raw bytes this should work 
             # regardless of the type => One might merch this with subtype == 4 or distinguish between Ipv4 and Ipv6 and give it statically
             return len(self.value)

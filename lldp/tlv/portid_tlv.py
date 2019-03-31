@@ -124,7 +124,13 @@ class PortIdTLV(TLV):
         See `TLV.__bytes__()` for more information.
         """
         # TODO: Implement
-        return NotImplemented
+        if self.subtype == PortIdTLV.Subtype.NETWORK_ADDRESS:
+            hexval = self.value.packed().hex()
+        else:
+            hexval = self.value.encode().hex() 
+        x = '2' + str(hex(self.__len__())) + str(hex(self.subtype.value())) + str(hexval)
+        return bytes.fromhex(x)
+        # DONE
 
     def __len__(self):
         """Return the length of the TLV value.

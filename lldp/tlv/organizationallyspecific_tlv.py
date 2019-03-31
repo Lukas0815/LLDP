@@ -55,7 +55,9 @@ class OrganizationallySpecificTLV(TLV):
         See `TLV.__bytes__()` for more information.
         """
         # TODO: Implement
-        return NotImplemented
+        x = '7F' + str(hex(self.__len__())) + str(self.oui.hex()) + str(self.subtype.hex()) + str(self.value.encode().hex())
+        return bytes.fromhex(x)
+        # DONE
 
     def __len__(self):
         """Return the length of the TLV value.
