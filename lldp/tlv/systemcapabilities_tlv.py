@@ -89,7 +89,9 @@ class SystemCapabilitiesTLV(TLV):
         """
         # TODO: Implement
         self.type = TLV.Type.SYSTEM_CAPABILITIES
-        self.value = NotImplemented
+        self.value = (supported << 8) + enabled
+        self.supported = supported
+        self.enabled = enabled
 
     def __bytes__(self):
         """Return the byte representation of the TLV.
@@ -98,9 +100,14 @@ class SystemCapabilitiesTLV(TLV):
         See `TLV.__bytes__()` for more information.
         """
         # TODO: Implement
-        x = '7' + str(hex(self.__len__())) 
-        return bytes.fromhex(x)
-        # UNFINISHED
+        firstByteInt = (7 << 1) + (self.__len__()  >> 7)
+        secondByteInt = self.__len__() >> 1
+        byteval = bytes([firstByteInt]) + bytes([secondByteInt])
+        # add value
+        byteval += self.value.to_bytes(self.value.bit_length(), byteorder='big')
+
+        return byteval
+
 
     def __len__(self):
         """Return the length of the TLV value.
@@ -131,7 +138,18 @@ class SystemCapabilitiesTLV(TLV):
         Raises a `ValueError` if the provided TLV contains errors (e.g. has the wrong type).
         """
         # TODO: Implement
-        return NotImplemented
+        work_data = bytearray(data)
+
+        # test type
+        type = work_data[0] >> 1
+        if type != 7:
+            raise ValueError
+        
+        # read values
+        supported = int.from_bytes(work_data[2:3], byteorder='big', signed=False)
+        enabled = int.from_bytes(work_data[4:5], byteorder='big', signed=False)
+
+        return SystemCapabilitiesTLV(supported, enabled)
 
     def supports(self, capabilities: int):
         """Check if the system supports a given set of capabilities.
@@ -139,7 +157,8 @@ class SystemCapabilitiesTLV(TLV):
         Multiple capabilities should be ORed together.
         """
         # TODO: Implement
-        raise NotImplemented
+        return capabilities == (capabilities & self.supported)
+    
 
     def enabled(self, capabilities: int):
         """Check if the system has a given capability enabled.
@@ -147,4 +166,4 @@ class SystemCapabilitiesTLV(TLV):
         Multiple capabilities should be ORed together.
         """
         # TODO: Implement
-        raise NotImplemented
+        return capabilities == (capabilities & self.enabled)

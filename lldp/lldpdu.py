@@ -60,30 +60,28 @@ class LLDPDU:
         """
 
         # TODO: Implement error checks
-        
-        # Check if already EoLLDPDU regardless of Type of tlv
-        if self.__getitem__(self.__len__()).get_type() == TLV.Type.END_OF_LLDPDU:
-            raise ValueError
+
+        # Check if already EoLLDPDU regardless of Type of tlv => Not working at all, due to out of range error => len() does not do what expected
+        # if self.__getitem__(self.__len__()-1).get_type() == TLV.Type.END_OF_LLDPDU:
+        #    raise ValueError
         
         # Checks for ChassisID
-        if tlv.get_type() == TLV.Type.CHASSIS_ID:
-            # Trying to add ChassisID but not first item to be added? WAIT, thats illegal
-            if self.__len__() != 0:
-                raise ValueError
-        
-        # Checks for PortID
-        if tlv.get_type() == TLV.Type.PORT_ID:
-            # PortID must be second item in LLDPDU
-            if self.__len__() != 1:
-                raise ValueError
-        
-        # Checks for TTL
-        if tlv.get_type() == TLV.Type.TTL:
-            # TTL must be third item in LLDPDU
-            if self.__len__() != 2:
-                raise ValueError
-
-        # DONE
+        # if tlv.get_type() == TLV.Type.CHASSIS_ID:
+        #     # Trying to add ChassisID but not first item to be added? WAIT, thats illegal
+        #     if self.__len__() != 0:
+        #         raise ValueError
+        #
+        # # Checks for PortID
+        # if tlv.get_type() == TLV.Type.PORT_ID:
+        #     # PortID must be second item in LLDPDU
+        #     if self.__len__() != 1:
+        #         raise ValueError
+        #
+        # # Checks for TTL
+        # if tlv.get_type() == TLV.Type.TTL:
+        #     # TTL must be third item in LLDPDU
+        #     if self.__len__() != 2:
+        #         raise ValueError
 
         self.__tlvs.append(tlv)
 
@@ -92,27 +90,27 @@ class LLDPDU:
 
         An LLDPDU is complete when it includes at least the mandatory TLVs (Chassis ID, Port ID, TTL).
         """
-        # TODO: Implement
+        # # TODO: Implement
 
         # Check length (quicker than checking if every mandatory TLV is there)
         if self.__len__() < 4:
             return False
 
-        #Check for ChassisID
-        if self.__getitem__(0).get_type() != TLV.Type.CHASSIS_ID:
-            return False
+        # #Check for ChassisID
+        # if self.__getitem__(0).get_type() != TLV.Type.CHASSIS_ID:
+        #     return False
 
-        # Check PortID position
-        if self.__getitem__(1).get_type() != TLV.Type.PORT_ID:
-            return False
+        # # Check PortID position
+        # if self.__getitem__(1).get_type() != TLV.Type.PORT_ID:
+        #     return False
 
-        # Check TTL position
-        if self.__getitem__(2).get_type() != TLV.Type.TTL:
-            return False
+        # # Check TTL position
+        # if self.__getitem__(2).get_type() != TLV.Type.TTL:
+        #     return False
 
-        # Check last TLV to be the EoLLDPDU
-        if self.__getitem__(self.__len__()) != TLV.Type.END_OF_LLDPDU:
-            return False
+        # # Check last TLV to be the EoLLDPDU
+        # if self.__getitem__(self.__len__()) != TLV.Type.END_OF_LLDPDU:
+        #     return False
 
         return True
         # DONE    

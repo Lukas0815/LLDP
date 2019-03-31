@@ -108,10 +108,6 @@ class PortIdTLV(TLV):
                 Otherwise       -> str
         """
         # TODO: Implement
-        # self.type = NotImplemented
-        # self.subtype = NotImplemented
-        # self.value = NotImplemented
-
         self.type = TLV.Type.PORT_ID
         self.subtype = subtype
         self.value = id
@@ -124,12 +120,16 @@ class PortIdTLV(TLV):
         See `TLV.__bytes__()` for more information.
         """
         # TODO: Implement
+        firstByteInt = (2 << 1) + (self.__len__()  >> 7)
+        secondByteInt = self.__len__() >> 1
+        byteval = bytes([firstByteInt]) + bytes([secondByteInt])
+        # add value
+
         if self.subtype == PortIdTLV.Subtype.NETWORK_ADDRESS:
-            hexval = self.value.packed().hex()
+            byteval += self.value.packed
         else:
-            hexval = self.value.encode().hex() 
-        x = '2' + str(hex(self.__len__())) + str(hex(self.subtype.value())) + str(hexval)
-        return bytes.fromhex(x)
+            byteval += self.value.encode()
+        return byteval
         # DONE
 
     def __len__(self):
@@ -147,7 +147,7 @@ class PortIdTLV(TLV):
         elif self.subtype == 4:
             # case value is Network Address: Since those are also given in raw bytes this should work 
             # regardless of the type => One might merch this with subtype == 4
-            return len(self.value)
+            return len(self.value.packed)
         else:
             #Case value is a string
             # See also chassisid_tlv
@@ -173,4 +173,27 @@ class PortIdTLV(TLV):
         Raises a `ValueError` if the provided TLV contains errors (e.g. has the wrong type).
         """
         # TODO: Implement
-        return NotImplemented
+        work_data = bytearray(data)
+
+        # check type
+        type = work_data[0] >> 1
+        if type != 2:
+            raise ValueError
+
+        # check subtype
+        subtype = work_data[2]
+        if not (0 < subtype < 8):
+            raise ValueError
+        
+        # get data
+        if subtype == PortIdTLV.Subtype.MAC_ADDRESS:
+            value = work_data[3:]
+        elif subtype == PortIdTLV.Subtype.NETWORK_ADDRESS:
+            address_str = work_data[4:].decode()
+            value = ip_address(address_str) # if this does not work one might try an int
+        else:
+            # String data
+            value = work_data[3:].decode()
+
+
+        return PortIdTLV(subtype, value)

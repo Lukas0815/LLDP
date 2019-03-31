@@ -39,8 +39,13 @@ class PortDescriptionTLV(TLV):
         See `TLV.__bytes__()` for more information.
         """
         # TODO: Implement
-        x = '4' + str(hex(self.__len__())) + str(self.value.encode().hex())
-        return bytes.fromhex(x)
+        firstByteInt = (4 << 1) + (self.__len__()  >> 7)
+        secondByteInt = self.__len__() >> 1
+        byteval = bytes([firstByteInt]) + bytes([secondByteInt])
+        # add value
+        byteval += self.value.encode()
+
+        return byteval
         # DONE
 
     def __len__(self):
@@ -73,7 +78,17 @@ class PortDescriptionTLV(TLV):
         Raises a `ValueError` if the provided TLV contains errors (e.g. has the wrong type).
         """
         # TODO: Implement
-        return NotImplemented
+        work_data = bytearray(data)
+
+        # check type
+        type = work_data[0] >> 1
+        if type != 4:
+            raise ValueError
+        
+        # get value
+        value = work_data[2:].decode()
+
+        return PortDescriptionTLV(value)
 
 
 class SystemDescriptionTLV(TLV):
@@ -103,8 +118,8 @@ class SystemDescriptionTLV(TLV):
 
     def __init__(self, description: str):
         # TODO: Implement
-        self.type = NotImplemented
-        self.value = NotImplemented
+        self.type = TLV.Type.SYSTEM_DESCRIPTION
+        self.value = description
 
     def __bytes__(self):
         """Return the byte representation of the TLV.
@@ -113,7 +128,13 @@ class SystemDescriptionTLV(TLV):
         See `TLV.__bytes__()` for more information.
         """
         # TODO: Implement
-        return NotImplemented
+        firstByteInt = (6 << 1) + (self.__len__()  >> 7)
+        secondByteInt = self.__len__() >> 1
+        byteval = bytes([firstByteInt]) + bytes([secondByteInt])
+        # add decsription
+        byteval += self.value.encode()
+
+        return byteval
 
     def __len__(self):
         """Return the length of the TLV value.
@@ -122,7 +143,7 @@ class SystemDescriptionTLV(TLV):
         See `TLV.__len__()` for more information.
         """
         # TODO: Implement
-        return NotImplemented
+        return len(self.value.encode())
 
     def __repr__(self):
         """Return a printable representation of the TLV object.
@@ -130,7 +151,7 @@ class SystemDescriptionTLV(TLV):
         See `TLV.__repr__()` for more information.
         """
         # TODO: Implement
-        return NotImplemented
+        return "SystemDescriptionTLV(" + repr(self.value) + ")"
 
     @staticmethod
     def from_bytes(data: TLV.ByteType):
@@ -142,7 +163,17 @@ class SystemDescriptionTLV(TLV):
         Raises a `ValueError` if the provided TLV contains errors (e.g. has the wrong type).
         """
         # TODO: Implement
-        return NotImplemented
+        work_data = bytearray(data)
+
+        # check type
+        type = work_data[0] >> 1
+        if type != 6:
+            raise ValueError
+        
+        # get value
+        value = work_data[2:].decode()
+
+        return SystemDescriptionTLV(value)
 
 
 class SystemNameTLV(TLV):
@@ -172,8 +203,8 @@ class SystemNameTLV(TLV):
 
     def __init__(self, name: str):
         # TODO: Implement
-        self.type = NotImplemented
-        self.value = NotImplemented
+        self.type = TLV.Type.SYSTEM_NAME
+        self.value = name
 
     def __bytes__(self):
         """Return the byte representation of the TLV.
@@ -182,7 +213,13 @@ class SystemNameTLV(TLV):
         See `TLV.__bytes__()` for more information.
         """
         # TODO: Implement
-        return NotImplemented
+        firstByteInt = (5 << 1) 
+        secondByteInt = self.__len__()
+        byteval = bytes([firstByteInt]) + bytes([secondByteInt])
+        # add value
+        byteval += self.value.encode()
+
+        return byteval
 
     def __len__(self):
         """Return the length of the TLV value.
@@ -191,7 +228,7 @@ class SystemNameTLV(TLV):
         See `TLV.__len__()` for more information.
         """
         # TODO: Implement
-        return NotImplemented
+        return len(self.value.encode())
 
     def __repr__(self):
         """Return a printable representation of the TLV object.
@@ -199,7 +236,7 @@ class SystemNameTLV(TLV):
         See `TLV.__repr__()` for more information.
         """
         # TODO: Implement
-        return NotImplemented
+        return "SystemNameTLV("+  repr(self.value) + ")"
 
     @staticmethod
     def from_bytes(data: TLV.ByteType):
@@ -211,4 +248,14 @@ class SystemNameTLV(TLV):
         Raises a `ValueError` if the provided TLV contains errors (e.g. has the wrong type).
         """
         # TODO: Implement
-        return NotImplemented
+        work_data = bytearray(data)
+
+        # test type
+        type = work_data[0] >> 1
+        if type != 5:
+            raise ValueError
+        
+        # get value
+        value = work_data[2:].decode()
+
+        return SystemNameTLV(value)

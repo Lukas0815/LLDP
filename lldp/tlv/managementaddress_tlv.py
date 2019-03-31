@@ -105,8 +105,14 @@ class ManagementAddressTLV(TLV):
         # TODO: Implement
         self.type = TLV.Type.MANAGEMENT_ADDRESS
         self.subtype = ifsubtype
+        if type(address) == str:
+            address = ip_address(address)
+
         self.value = address
-        self.oid = oid
+        if oid is None:
+            self.oid = bytes([0])
+        else:
+            self.oid = oid
 
         self.ifnmbr = interface_number
         # DONE
@@ -117,13 +123,39 @@ class ManagementAddressTLV(TLV):
         This method must return bytes. Returning a bytearray will raise a TypeError.
         See `TLV.__bytes__()` for more information.
         """
-        # TODO: Implement
-        manageAddressStringLength = hex(len(self.value.packed()))
-        mAddressSubtype = '0x1' # Placeholder
-        # NOTE: Add str() to hex() ?
-        x = '1' + str(manageAddressStringLength) + mAddressSubtype + self.value.packed() + hex(self.subtype.value()) + hex(self.ifnmbr) + hex(len(self.oid)) + self.oid.hex()
+        
+        """ Achtung, könnte alles jeweils 1 byte groß sein
+            Dementsprechend ist das bitshiften nicht notwendig
+        """
 
-        return bytes.fromhex(x)
+        # TODO: Implement
+        # get type and length right (first 2 bytes)
+        firstByteInt = (1 << 1) + (self.__len__()  >> 7)
+        secondByteInt = self.__len__() >> 1
+        byteval = bytes([firstByteInt]) + bytes([secondByteInt])
+        #add Management Address string length (of byterep?)
+        byteval += bytes([len(self.value.packed)])
+        # add Management Address Subtype
+        if self.value.version == 4:
+            byteval += bytes([1])
+        else:
+            byteval += bytes([2])
+        # add Management address
+        byteval += self.value.packed
+        # add Interface Numbering subtype
+        byteval += bytes([self.subtype])    # maybe .value() needed?
+        # add Interface Number
+        byteval += bytes([self.ifnmbr])
+        # oid length
+        byteval += bytes([len(self.oid)])
+        # add oid
+        byteval += self.oid
+
+        # NOTE: Add str() to hex() ?
+        #x = '1' + str(manageAddressStringLength) + mAddressSubtype + self.value.packed() + hex(self.subtype.value()) + hex(self.ifnmbr) + hex(len(self.oid)) + self.oid.hex()
+
+        #return bytes.fromhex(x)
+        return byteval
         # DONE
 
     def __len__(self):
@@ -134,8 +166,8 @@ class ManagementAddressTLV(TLV):
         """
         # TODO: Implement
 
-        # Note: Only includes length of Address?!
-        return len(self.value.packed())
+        # Note: Only includes length of Address?!   
+        return len(self.value.packed)
         # DONE
 
     def __repr__(self):
@@ -156,4 +188,32 @@ class ManagementAddressTLV(TLV):
         Raises a `ValueError` if the provided TLV contains errors (e.g. has the wrong type).
         """
         # TODO: Implement
-        return NotImplemented
+        work_data = bytearray(data)
+        
+        # check type
+        type = work_data[0]
+        
+        # TODO: check length
+
+        # Management Address String length
+        ma_strlength = work_data[2]
+
+        # Management Address Subtype
+        ma_subtype = work_data[3]
+
+        # Management Address
+        ma_address = ip_address(work_data[4:4+ma_strlength].decode())
+
+        # Interface Numbering Subtype
+        insubtype = work_data[5+ma_strlength]
+
+        # Interface Number
+        ifacenmbr = work_data[6+ma_strlength:10+ma_strlength]
+
+        #OID String length
+        oid_strlength = work_data[11+ma_strlength]
+
+        # OID
+        oid = work_data[12+ma_strlength:]
+
+        return ManagementAddressTLV(ma_address, ifacenmbr, insubtype, oid)

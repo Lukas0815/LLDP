@@ -121,9 +121,11 @@ class TLV(object):
             subtype (int, optional): If the respective TLV has a subtype, it should be stored here.
                 Otherwise, this should be set to None
         """
-        self.type = None
-        self.subtype = None
-        self.value = None
+
+        # TODO: changed this from None. No TODO was here before so not sure if permitted
+        self.type = type
+        self.subtype = subtype
+        self.value = value_bytes
 
     def __bytes__(self) -> bytes:
         """Return the byte representation of the TLV.

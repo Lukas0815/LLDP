@@ -127,23 +127,29 @@ class ChassisIdTLV(TLV):
         This method must return bytes. Returning a bytearray will raise a TypeError.
         See `TLV.__bytes__()` for more information.
         """
-        
-        # TODO: Implement
-        hexvaluestr = ''
 
+        # TODO: Implement
+        #byteval = bytes([1]) + bytes([self.__len__()])
+        firstByteInt = (1 << 1) 
+        secondByteInt = self.__len__()
+        byteval = bytes([firstByteInt]) + bytes([secondByteInt])
+        # add subtype
+        byteval += bytes([self.subtype.value])
+        # add the value
         if self.subtype == ChassisIdTLV.Subtype.MAC_ADDRESS:
             # value is MAC in bytes
-            hexvaluestr = self.value.hex()
+            byteval += self.value
         elif self.subtype == ChassisIdTLV.Subtype.NETWORK_ADDRESS:
             # value is ipaddress which supposedly is encoded in raw bytes
-            hexvaluestr = self.value.hex()
+            if self.value.version == 4:
+                prebyte = b'\x01'
+            else:
+                prebyte = b'\x02'
+            byteval +=  prebyte + self.value.packed
         else:
             # value is a string so encode it
-            hexvaluestr = str(self.value.encode())
-
-        tlvhexstr = '1' + str(hex(self.__len__())) + hexvaluestr
-    
-        return bytes.fromhex(tlvhexstr)
+            byteval += self.value.encode()
+        return byteval
         # DONE
 
     def __len__(self):
@@ -153,18 +159,18 @@ class ChassisIdTLV(TLV):
         See `TLV.__len__()` for more information.
         """
         # TODO: Implement
-        # Note: This does not include subtype length
+        # Note: Subtype included with +1 because it always takes 8bit/1byte
 
         if (self.subtype == ChassisIdTLV.Subtype.MAC_ADDRESS):
             # Case value is Mac: Since MAC-Address is given in raw bytes this should work
-            return len(self.value)
+            return len(self.value) +1
         elif self.subtype == ChassisIdTLV.Subtype.NETWORK_ADDRESS:
             # case value is Network Address: Since those are also given in raw bytes this should work 
-            # regardless of the type => One might merch this with subtype == 4 or distinguish between Ipv4 and Ipv6 and give it statically
-            return len(self.value)
+            # adding +1 because there is one byte extra before actual address to determine the type (IPv4 or IPv6)
+            return len(self.value.packed) +2
         else:
             #Case value is a string
-            return len(self.value.encode())     #Not sure if this always works... Internet says this does give size of string in bytes!
+            return len(self.value.encode()) +1    #Not sure if this always works... Internet says this does give size of string in bytes!
         return NotImplemented
         #DONE
 
@@ -186,5 +192,39 @@ class ChassisIdTLV(TLV):
 
         Raises a `ValueError` if the provided TLV contains errors (e.g. has the wrong type).
         """
-        # TODO: Implement
-        return NotImplemented
+        
+        work_data = bytearray(data)
+        
+        # check if data is actually data of chassisId_TLV
+        type = work_data[0] >> 1
+        if type != 1:
+            raise ValueError
+
+        #read length
+        highestBit = work_data[0] & 1
+        length = (highestBit << 9) + work_data[1]
+        # length = work_data[1]
+        # TODO: check if length is actually valid or not
+        
+        # read the subtype
+        subtype = work_data[2]
+        # check if valid subtype
+        if not (0 < subtype < 8):
+            raise ValueError
+        
+        # process data
+        if subtype == ChassisIdTLV.Subtype.MAC_ADDRESS:
+            # if data is MAC address it is just bytes
+            value = work_data[3:]
+        elif subtype == ChassisIdTLV.Subtype.NETWORK_ADDRESS:
+            # the bytes must be reconstructed into an ipaddress object
+            #print("subtype network_address: ", work_data)
+            adddress_str = work_data[4:]
+
+            value = ip_address(adddress_str)
+        else:
+            # data consists of strings
+            value = work_data[3:].decode()
+        
+
+        return ChassisIdTLV(subtype, value)

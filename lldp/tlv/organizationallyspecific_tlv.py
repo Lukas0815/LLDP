@@ -45,7 +45,10 @@ class OrganizationallySpecificTLV(TLV):
         self.type = TLV.Type.ORGANIZATIONALLY_SPECIFIC
         self.oui = oui
         self.subtype = subtype
-        self.value = value
+        if type(value) == str:
+            self.value = value.encode()
+        else:
+            self.value = value
         # DONE
 
     def __bytes__(self):
@@ -55,8 +58,17 @@ class OrganizationallySpecificTLV(TLV):
         See `TLV.__bytes__()` for more information.
         """
         # TODO: Implement
-        x = '7F' + str(hex(self.__len__())) + str(self.oui.hex()) + str(self.subtype.hex()) + str(self.value.encode().hex())
-        return bytes.fromhex(x)
+        firstByteInt = (127 << 1) + (self.__len__()  >> 7)
+        secondByteInt = self.__len__() >> 1
+        byteval = bytes([firstByteInt]) + bytes([secondByteInt])
+        # add oui
+        byteval += self.oui
+        # add subtype
+        byteval += self.subtype
+        # add value
+        byteval += self.value
+
+        return byteval
         # DONE
 
     def __len__(self):
@@ -66,8 +78,7 @@ class OrganizationallySpecificTLV(TLV):
         See `TLV.__len__()` for more information.
         """
         # TODO: Implement
-        # Note: Probably horribly wrong
-        return len(self.value.to_bytes())
+        return len(self.value)
         # DONE
 
 
@@ -90,4 +101,17 @@ class OrganizationallySpecificTLV(TLV):
         Raises a `ValueError` if the provided TLV contains errors (e.g. has the wrong type).
         """
         # TODO: Implement
-        return NotImplemented
+        work_data = bytearray(data)
+        # check type
+        type = work_data[0] >> 1
+        if type != 127:
+            raise ValueError
+        
+        # oui
+        oui = work_data[2]
+        # oui subtype
+        subtype = work_data[3]
+        #value
+        value = work_data[4:]
+
+        return OrganizationallySpecificTLV(oui, subtype, value)

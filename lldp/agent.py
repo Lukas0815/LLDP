@@ -37,8 +37,7 @@ class LLDPAgent:
         """
         if sock is None:
             # Open a socket suitable for transmitting LLDP frames.
-            self.socket = None  # TODO: Implement
-            raise NotImplementedError
+            self.socket = socket(socket.AF_PACKET, socket.SOCK_RAW, 0) # DONE
         else:
             self.socket = sock
 
@@ -78,10 +77,19 @@ class LLDPAgent:
 
                     # Check format and extract LLDPDU (raw bytes)
                     # TODO: Implement
+                    work_data = bytearray(data)
+                    destination = work_data[:6]
+                    source = work_data[6:12]
+                    if source != b'\x01\x80\xc2\x00\x00\x0e':
+                        raise ValueError
+                    etherType = work_data[12:14]
+                    if etherType != b'\x88\xcc':
+                        raise ValueError
+                    raw_lldpdu = work_data[14:]
 
                     # Instantiate LLDPDU object from raw bytes
                     # TODO: Implement
-                    lldpdu = NotImplemented
+                    lldpdu = LLDPDU.from_bytes(raw_lldpdu)
 
                     # Log contents
                     self.logger.log(str(lldpdu))
@@ -112,11 +120,19 @@ class LLDPAgent:
 
         # Construct LLDPDU
         # TODO: Implement
-        lldpdu = NotImplemented
+        tlvs = []
+        tlvs.append(ChassisIdTLV(ChassisIdTLV.Subtype.MAC_ADDRESS, self.mac_address))
+        tlvs.append(PortIdTLV(PortIdTLV.Subtype.INTERFACE_NAME, self.interface_name))
+        tlvs.append(TTLTLV(60))
+        tlvs.append(EndOfLLDPDUTLV())
+        lldpdu = LLDPDU(*tlvs)
 
         # Construct Ethernet Frame
         # TODO: Implement
-        frame = NotImplemented
+        frame = bytearray(b'\x01\x80\xc2\x00\x00\x0e') 
+        frame += self.mac_address
+        frame += b'\x88\xcc'
+        frame += bytes(lldpdu)
 
         # Send frame
         self.socket.send(frame)

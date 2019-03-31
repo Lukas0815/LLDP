@@ -38,8 +38,13 @@ class TTLTLV(TLV):
         See `TLV.__bytes__()` for more information.
         """
         # TODO: Implement
-        x = '3' + str(hex(self.__len__())) + str(hex(self.value))
-        return bytes.fromhex(x)
+        firstByteInt = (3 << 1) + (self.__len__()  >> 7)
+        secondByteInt = self.__len__() >> 1
+        byteval = bytes([firstByteInt]) + bytes([secondByteInt])
+        #add value
+        byteval += self.value.to_bytes(self.value.bit_length(), 'big')
+
+        return byteval
         # DONE
 
     def __len__(self):
@@ -49,8 +54,8 @@ class TTLTLV(TLV):
         See `TLV.__len__()` for more information.
         """
         # TODO: Implement
-        #return 2
-        return len(self.value.to_bytes())
+        return len(self.value.to_bytes(self.value.bit_length(), 'big'))
+        # DONE
 
     def __repr__(self):
         """Return a printable representation of the TLV object.
