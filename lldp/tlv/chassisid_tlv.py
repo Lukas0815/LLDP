@@ -216,15 +216,38 @@ class ChassisIdTLV(TLV):
         if subtype == ChassisIdTLV.Subtype.MAC_ADDRESS:
             # if data is MAC address it is just bytes
             value = work_data[3:]
+            # MAC addresses consists of 6 bytes
+            if len(work_data)-3 != 6:
+                raise ValueError
         elif subtype == ChassisIdTLV.Subtype.NETWORK_ADDRESS:
             # the bytes must be reconstructed into an ipaddress object
             #print("subtype network_address: ", work_data)
-            adddress_str = work_data[4:]
+            iptype = work_data[3]
+            address = work_data[4:]
 
-            value = ip_address(adddress_str)
+            value = ip_address(addr2Str(iptype, address))
         else:
             # data consists of strings
             value = work_data[3:].decode()
         
 
         return ChassisIdTLV(subtype, value)
+
+def addr2Str(iptype, data):
+    addrstr = ''
+    work_data = bytearray(data)
+    if iptype == 1:
+        for b in work_data:
+            addrstr += str(b) + '.'
+    else:
+        counter = 0
+        genau = bytearray()
+        for b in work_data:
+            counter += 1
+            genau.append(b)
+            if counter == 2:
+                addrstr += str(hex(b))[2:] + ':'
+                genau = bytearray()
+                counter = 0
+
+    return addrstr[:-1]

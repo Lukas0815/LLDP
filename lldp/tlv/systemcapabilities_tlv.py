@@ -89,7 +89,7 @@ class SystemCapabilitiesTLV(TLV):
         """
         # TODO: Implement
         self.type = TLV.Type.SYSTEM_CAPABILITIES
-        self.value = (supported << 8) + enabled
+        self.value = (supported << 16) + enabled
         self.supported = supported
         self.enabled = enabled
 
@@ -100,11 +100,11 @@ class SystemCapabilitiesTLV(TLV):
         See `TLV.__bytes__()` for more information.
         """
         # TODO: Implement
-        firstByteInt = (7 << 1) + (self.__len__()  >> 7)
-        secondByteInt = self.__len__() >> 1
-        byteval = bytes([firstByteInt]) + bytes([secondByteInt])
+        firstByteInt = (7 << 1)
+        secondByteInt = self.__len__()
+        byteval = firstByteInt.to_bytes(1, byteorder='big', signed=False) + secondByteInt.to_bytes(1, byteorder='big', signed=False)
         # add value
-        byteval += self.value.to_bytes(self.value.bit_length(), byteorder='big')
+        byteval += self.value.to_bytes(4, byteorder='big', signed=False)
 
         return byteval
 
@@ -140,6 +140,11 @@ class SystemCapabilitiesTLV(TLV):
         # TODO: Implement
         work_data = bytearray(data)
 
+        # test overal length
+        if len(work_data) != 6:
+            raise ValueError
+        
+
         # test type
         type = work_data[0] >> 1
         if type != 7:
@@ -148,6 +153,9 @@ class SystemCapabilitiesTLV(TLV):
         # read values
         supported = int.from_bytes(work_data[2:3], byteorder='big', signed=False)
         enabled = int.from_bytes(work_data[4:5], byteorder='big', signed=False)
+
+        if (supported | enabled) != supported:
+            raise ValueError
 
         return SystemCapabilitiesTLV(supported, enabled)
 

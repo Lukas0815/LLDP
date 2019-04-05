@@ -96,7 +96,7 @@ class LLDPDU:
         if self.__len__() < 4:
             return False
 
-        # #Check for ChassisID
+        #Check for ChassisID
         # if self.__getitem__(0).get_type() != TLV.Type.CHASSIS_ID:
         #     return False
 

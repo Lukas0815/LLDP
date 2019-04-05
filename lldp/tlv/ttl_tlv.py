@@ -31,6 +31,9 @@ class TTLTLV(TLV):
         self.type = TLV.Type.TTL
         self.value = ttl
 
+        if ttl < 0 or ttl > 65535:
+            raise ValueError
+
     def __bytes__(self):
         """Return the byte representation of the TLV.
 
@@ -39,10 +42,10 @@ class TTLTLV(TLV):
         """
         # TODO: Implement
         firstByteInt = (3 << 1) + (self.__len__()  >> 7)
-        secondByteInt = self.__len__() >> 1
-        byteval = bytes([firstByteInt]) + bytes([secondByteInt])
+        secondByteInt = self.__len__()
+        byteval = firstByteInt.to_bytes(1, byteorder='big') + secondByteInt.to_bytes(1, byteorder='big')
         #add value
-        byteval += self.value.to_bytes(self.value.bit_length(), 'big')
+        byteval += self.value.to_bytes(2, 'big')
 
         return byteval
         # DONE
@@ -54,7 +57,7 @@ class TTLTLV(TLV):
         See `TLV.__len__()` for more information.
         """
         # TODO: Implement
-        return len(self.value.to_bytes(self.value.bit_length(), 'big'))
+        return 2
         # DONE
 
     def __repr__(self):
@@ -76,4 +79,27 @@ class TTLTLV(TLV):
         Raises a `ValueError` if the provided TLV contains errors (e.g. has the wrong type).
         """
         # TODO: Implement
-        return NotImplemented
+        work_data = bytearray(data)
+        
+        # check the length
+        if len(work_data) != 4:
+            raise ValueError
+
+        # check type
+        type = work_data[0] >> 1
+        if type != 3:
+            raise ValueError
+
+        #read length
+        highestBit = work_data[0] & 1
+        length = (highestBit << 9) + work_data[1]
+        if length != 2: #appereandly always 2 bytes
+            raise ValueError
+       
+
+        # get ttl
+        ttl = int.from_bytes(work_data[2:], byteorder='big', signed=False)
+        if ttl < 0 or ttl > 65535:
+            raise ValueError
+
+        return TTLTLV(ttl)

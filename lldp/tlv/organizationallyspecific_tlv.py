@@ -59,7 +59,7 @@ class OrganizationallySpecificTLV(TLV):
         """
         # TODO: Implement
         firstByteInt = (127 << 1) + (self.__len__()  >> 7)
-        secondByteInt = self.__len__() >> 1
+        secondByteInt = self.__len__()
         byteval = bytes([firstByteInt]) + bytes([secondByteInt])
         # add oui
         byteval += self.oui
@@ -78,7 +78,7 @@ class OrganizationallySpecificTLV(TLV):
         See `TLV.__len__()` for more information.
         """
         # TODO: Implement
-        return len(self.value)
+        return len(self.value) +4
         # DONE
 
 
@@ -108,10 +108,10 @@ class OrganizationallySpecificTLV(TLV):
             raise ValueError
         
         # oui
-        oui = work_data[2]
+        oui = work_data[2:5]
         # oui subtype
-        subtype = work_data[3]
+        subtype = work_data[5]
         #value
-        value = work_data[4:]
+        value = work_data[6:]
 
         return OrganizationallySpecificTLV(oui, subtype, value)

@@ -121,12 +121,20 @@ class PortIdTLV(TLV):
         """
         # TODO: Implement
         firstByteInt = (2 << 1) + (self.__len__()  >> 7)
-        secondByteInt = self.__len__() >> 1
+        secondByteInt = self.__len__()
         byteval = bytes([firstByteInt]) + bytes([secondByteInt])
-        # add value
+        # add subtype
+        byteval += bytes([self.subtype.value])
 
+        # add value
         if self.subtype == PortIdTLV.Subtype.NETWORK_ADDRESS:
+            if self.value.version == 4:
+                byteval += bytes([1])
+            else:
+                byteval += bytes([2])
             byteval += self.value.packed
+        elif self.subtype == PortIdTLV.Subtype.MAC_ADDRESS:
+            byteval += self.value
         else:
             byteval += self.value.encode()
         return byteval
@@ -141,17 +149,17 @@ class PortIdTLV(TLV):
         # TODO: Implement
         # Note: This does not include subtype length
 
-        if (self.subtype == 3):
+        if (self.subtype == PortIdTLV.Subtype.MAC_ADDRESS):
             # Case value is Mac: Since MAC-Address is given in raw bytes this should work
-            return len(self.value)
-        elif self.subtype == 4:
+            return len(self.value) +1
+        elif self.subtype == PortIdTLV.Subtype.NETWORK_ADDRESS:
             # case value is Network Address: Since those are also given in raw bytes this should work 
             # regardless of the type => One might merch this with subtype == 4
-            return len(self.value.packed)
+            return len(self.value.packed) +2
         else:
             #Case value is a string
             # See also chassisid_tlv
-            return len(self.value.encode())     #Not sure if this always works... Internet says this does give size of string in bytes!
+            return len(self.value.encode())+1     #Not sure if this always works... Internet says this does give size of string in bytes!
         return NotImplemented
 
     def __repr__(self):

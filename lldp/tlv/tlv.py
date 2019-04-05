@@ -61,7 +61,8 @@ class TLV(object):
         """
 
         # Extract the type value from `data`
-        typevalue = None    # TODO: Implement
+        work_data = bytearray(data)
+        typevalue = work_data[0] >> 1
 
         # Return the proper type enum or raise an error
         try:

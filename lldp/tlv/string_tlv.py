@@ -40,7 +40,7 @@ class PortDescriptionTLV(TLV):
         """
         # TODO: Implement
         firstByteInt = (4 << 1) + (self.__len__()  >> 7)
-        secondByteInt = self.__len__() >> 1
+        secondByteInt = self.__len__()
         byteval = bytes([firstByteInt]) + bytes([secondByteInt])
         # add value
         byteval += self.value.encode()
@@ -129,7 +129,7 @@ class SystemDescriptionTLV(TLV):
         """
         # TODO: Implement
         firstByteInt = (6 << 1) + (self.__len__()  >> 7)
-        secondByteInt = self.__len__() >> 1
+        secondByteInt = self.__len__()
         byteval = bytes([firstByteInt]) + bytes([secondByteInt])
         # add decsription
         byteval += self.value.encode()
