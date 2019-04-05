@@ -159,7 +159,7 @@ class PortIdTLV(TLV):
         else:
             #Case value is a string
             # See also chassisid_tlv
-            return len(self.value.encode())+1     #Not sure if this always works... Internet says this does give size of string in bytes!
+            return len(self.value.encode())+1 
         return NotImplemented
 
     def __repr__(self):
@@ -197,11 +197,30 @@ class PortIdTLV(TLV):
         if subtype == PortIdTLV.Subtype.MAC_ADDRESS:
             value = work_data[3:]
         elif subtype == PortIdTLV.Subtype.NETWORK_ADDRESS:
-            address_str = work_data[4:].decode()
-            value = ip_address(address_str) # if this does not work one might try an int
+            address_bytes = work_data[4:]
+            value = ip_address(addr2Str(work_data[3], address_bytes)) # if this does not work one might try an int
         else:
             # String data
             value = work_data[3:].decode()
 
 
         return PortIdTLV(subtype, value)
+
+def addr2Str(iptype, data):
+    addrstr = ''
+    work_data = bytearray(data)
+    if iptype == 1:
+        for b in work_data:
+            addrstr += str(b) + '.'
+    else:
+        counter = 0
+        genau = bytearray()
+        for b in work_data:
+            counter += 1
+            genau.append(b)
+            if counter == 2:
+                addrstr += str(hex(int.from_bytes(genau, byteorder='big', signed=False)))[2:] + ':'
+                genau = bytearray()
+                counter = 0
+
+    return addrstr[:-1]

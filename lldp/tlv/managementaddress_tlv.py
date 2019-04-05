@@ -110,7 +110,7 @@ class ManagementAddressTLV(TLV):
 
         self.value = address
         if oid is None:
-            self.oid = bytes([0])
+            self.oid = None
         else:
             self.oid = oid
 
@@ -131,7 +131,7 @@ class ManagementAddressTLV(TLV):
         # TODO: Implement
         # get type and length right (first 2 bytes)
         firstByteInt = (1 << 1) + (self.__len__()  >> 7)
-        secondByteInt = self.__len__() >> 1
+        secondByteInt = self.__len__()
         byteval = bytes([firstByteInt]) + bytes([secondByteInt])
         #add Management Address string length (of byterep?)
         byteval += bytes([len(self.value.packed)])
@@ -147,14 +147,11 @@ class ManagementAddressTLV(TLV):
         # add Interface Number
         byteval += bytes([self.ifnmbr])
         # oid length
-        byteval += bytes([len(self.oid)])
+        byteval += bytes([0]) if self.oid is None else bytes([len(self.oid)])
         # add oid
-        byteval += self.oid
+        if not (self.oid is None):
+            byteval += self.oid
 
-        # NOTE: Add str() to hex() ?
-        #x = '1' + str(manageAddressStringLength) + mAddressSubtype + self.value.packed() + hex(self.subtype.value()) + hex(self.ifnmbr) + hex(len(self.oid)) + self.oid.hex()
-
-        #return bytes.fromhex(x)
         return byteval
         # DONE
 
@@ -165,9 +162,16 @@ class ManagementAddressTLV(TLV):
         See `TLV.__len__()` for more information.
         """
         # TODO: Implement
-
-        # Note: Only includes length of Address?!   
-        return len(self.value.packed)
+        if self.oid is None:
+            oidlength = 0
+        else: 
+            oidlength = len(self.oid)
+        # Note: Only includes length of Address?!  
+        if self.value.version == 4:
+            return 12 + oidlength
+        
+        # Case IPv6
+        return 24  + oidlength  # +4 for address?
         # DONE
 
     def __repr__(self):
@@ -196,24 +200,46 @@ class ManagementAddressTLV(TLV):
         # TODO: check length
 
         # Management Address String length
-        ma_strlength = work_data[2]
+        ma_strlength = work_data[2] -1
 
         # Management Address Subtype
         ma_subtype = work_data[3]
 
         # Management Address
-        ma_address = ip_address(work_data[4:4+ma_strlength].decode())
+        ma_address = ip_address(addr2Str(ma_subtype, work_data[4:5+ma_strlength-1]))
 
         # Interface Numbering Subtype
         insubtype = work_data[5+ma_strlength]
 
         # Interface Number
-        ifacenmbr = work_data[6+ma_strlength:10+ma_strlength]
+        ifacenmbr = work_data[6+ma_strlength:6+ma_strlength]
 
         #OID String length
-        oid_strlength = work_data[11+ma_strlength]
+        try:
+            oid_strlength = work_data[10+ma_strlength]
 
-        # OID
-        oid = work_data[12+ma_strlength:]
+            # OID
+            oid = work_data[11+ma_strlength:]
+        except IndexError:
+            oid = None
 
         return ManagementAddressTLV(ma_address, ifacenmbr, insubtype, oid)
+
+def addr2Str(iptype, data):
+    addrstr = ''
+    work_data = bytearray(data)
+    if iptype == 1:
+        for b in work_data:
+            addrstr += str(b) + '.'
+    else:
+        counter = 0
+        genau = bytearray()
+        for b in work_data:
+            counter += 1
+            genau.append(b)
+            if counter == 2:
+                addrstr += str(hex(int.from_bytes(genau, byteorder='big', signed=False)))[2:] + ':'
+                genau = bytearray()
+                counter = 0
+
+    return addrstr[:-1]

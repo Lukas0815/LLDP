@@ -111,10 +111,7 @@ class ChassisIdTLV(TLV):
                 Network Address -> ip_address
                 Otherwise       -> str
         """
-        # TODO: Implement
-        # self.type = NotImplemented
-        # self.subtype = NotImplemented
-        # self.value = NotImplemented
+       
         
         self.type = TLV.Type.CHASSIS_ID
         self.subtype = subtype
@@ -171,7 +168,6 @@ class ChassisIdTLV(TLV):
         else:
             #Case value is a string
             return len(self.value.encode()) +1    #Not sure if this always works... Internet says this does give size of string in bytes!
-        return NotImplemented
         #DONE
 
     def __repr__(self):
@@ -217,11 +213,11 @@ class ChassisIdTLV(TLV):
             # if data is MAC address it is just bytes
             value = work_data[3:]
             # MAC addresses consists of 6 bytes
-            if len(work_data)-3 != 6:
+            if len(value) != 6:
                 raise ValueError
+          
         elif subtype == ChassisIdTLV.Subtype.NETWORK_ADDRESS:
             # the bytes must be reconstructed into an ipaddress object
-            #print("subtype network_address: ", work_data)
             iptype = work_data[3]
             address = work_data[4:]
 
@@ -246,7 +242,7 @@ def addr2Str(iptype, data):
             counter += 1
             genau.append(b)
             if counter == 2:
-                addrstr += str(hex(b))[2:] + ':'
+                addrstr += str(hex(int.from_bytes(genau, byteorder='big', signed=False)))[2:] + ':'
                 genau = bytearray()
                 counter = 0
 

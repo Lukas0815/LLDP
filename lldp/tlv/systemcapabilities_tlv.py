@@ -151,11 +151,15 @@ class SystemCapabilitiesTLV(TLV):
             raise ValueError
         
         # read values
-        supported = int.from_bytes(work_data[2:3], byteorder='big', signed=False)
-        enabled = int.from_bytes(work_data[4:5], byteorder='big', signed=False)
+        supported = int.from_bytes(work_data[2:4], byteorder='big', signed=False)
+        enabled = int.from_bytes(work_data[4:6], byteorder='big', signed=False)
 
         if (supported | enabled) != supported:
             raise ValueError
+        if (supported & enabled) != enabled:
+            raise ValueError
+        print("supported: ", bin(supported))
+        print("enabled:   ", bin(enabled))
 
         return SystemCapabilitiesTLV(supported, enabled)
 

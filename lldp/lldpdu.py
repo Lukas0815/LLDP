@@ -60,6 +60,9 @@ class LLDPDU:
         """
 
         # TODO: Implement error checks
+        # LLDPDU must fit into an ethernet frame
+        if len(bytes()) > 1500:
+            raise ValueError
 
         # Check if already EoLLDPDU regardless of Type of tlv => Not working at all, due to out of range error => len() does not do what expected
         # if self.__getitem__(self.__len__()-1).get_type() == TLV.Type.END_OF_LLDPDU:
@@ -109,7 +112,7 @@ class LLDPDU:
         #     return False
 
         # # Check last TLV to be the EoLLDPDU
-        # if self.__getitem__(self.__len__()) != TLV.Type.END_OF_LLDPDU:
+        # if self.__getitem__(self.__len__()-1) != TLV.Type.END_OF_LLDPDU:
         #     return False
 
         return True
