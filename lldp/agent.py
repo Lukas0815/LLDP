@@ -74,27 +74,26 @@ class LLDPAgent:
 
                     # Get the next frame
                     data = r[0].recv(4096)
-
                     # Check format and extract LLDPDU (raw bytes)
-                    # TODO: Implement
+                    
                     work_data = bytearray(data)
+                    etherType = work_data[12:14]
+                    if etherType != b'\x88\xcc':
+                        #print("WRONG ETHER-TYPE")
+                        continue
                     destination = work_data[:6]
                     source = work_data[6:12]
                     # NOTE: this raises ValueError when executing main.py
-                    if not (source in [b'\x01\x80\xc2\x00\x00\x0e', b'\x01\x80\xc2\x00\x00\x00', b'\x01\x80\xc2\x00\x00\x03']):
-                        raise ValueError
-                    print("reached this")
-                    etherType = work_data[12:14]
-                    if etherType != b'\x88\xcc':
-                        raise ValueError
+                    if not (destination in [b'\x01\x80\xc2\x00\x00\x0e', b'\x01\x80\xc2\x00\x00\x00', b'\x01\x80\xc2\x00\x00\x03']):
+                        print("not correct source")
+                        continue
                     raw_lldpdu = work_data[14:]
 
                     # Instantiate LLDPDU object from raw bytes
-                    # TODO: Implement
+                    
                     lldpdu = LLDPDU.from_bytes(raw_lldpdu)
-                    if not lldpdu.complete():
-                        raise ValueError
-
+                    # if not lldpdu.complete():
+                    #     raise ValueError
                     # Log contents
                     self.logger.log(str(lldpdu))
                     received = True
@@ -103,6 +102,7 @@ class LLDPAgent:
                 t_now = time.time()
                 if t_now - t_previous > self.announce_interval:
                     self.announce()
+                    print("genau")
                     t_previous = t_now
 
         except KeyboardInterrupt:
@@ -123,7 +123,7 @@ class LLDPAgent:
         """
 
         # Construct LLDPDU
-        # TODO: Implement
+    
         tlvs = []
         tlvs.append(ChassisIdTLV(ChassisIdTLV.Subtype.MAC_ADDRESS, self.mac_address))
         tlvs.append(PortIdTLV(PortIdTLV.Subtype.INTERFACE_NAME, self.interface_name))
@@ -132,11 +132,10 @@ class LLDPAgent:
         lldpdu = LLDPDU(*tlvs)
 
         # Construct Ethernet Frame
-        # TODO: Implement
-        frame = bytearray(b'\x01\x80\xc2\x00\x00\x0e') 
+        
+        frame =  b'\x01\x80\xc2\x00\x00\x0e' 
         frame += self.mac_address
         frame += b'\x88\xcc'
         frame += bytes(lldpdu)
-
         # Send frame
         self.socket.send(frame)

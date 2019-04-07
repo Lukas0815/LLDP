@@ -20,8 +20,7 @@ class MockSocket:
         self.tx = self.tx[idx:]
         return res
 
-    # TODO implement different/additional socket methods?
-
+    
 
 class MockLogger:
     def __init__(self):

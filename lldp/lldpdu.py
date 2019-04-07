@@ -149,8 +149,8 @@ class LLDPDU:
         tlvs = []
         while notEnd:
             type = work_data[currentID] >> 1
+            
             if not (type in [0,1,2,3,4,5,6,7,8,127]):
-                print("type: ", type)
                 raise ValueError
             if type == TLV.Type.END_OF_LLDPDU:
                 notEnd = False    
