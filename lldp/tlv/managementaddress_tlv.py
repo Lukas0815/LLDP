@@ -102,7 +102,7 @@ class ManagementAddressTLV(TLV):
             ifsubtype (IFNumberingSubtype): The interface numbering subtype
             oid (bytes): The OID. See above
         """
-        # TODO: Implement
+        
         self.type = TLV.Type.MANAGEMENT_ADDRESS
         self.subtype = ifsubtype
         if type(address) == str:
@@ -128,7 +128,7 @@ class ManagementAddressTLV(TLV):
             Dementsprechend ist das bitshiften nicht notwendig
         """
 
-        # TODO: Implement
+       
         # get type and length right (first 2 bytes)
         firstByteInt = (8 << 1)
         secondByteInt = self.__len__()
@@ -161,7 +161,7 @@ class ManagementAddressTLV(TLV):
         This method must return an int. Returning anything else will raise a TypeError.
         See `TLV.__len__()` for more information.
         """
-        # TODO: Implement
+        
         if self.oid is None:
             oidlength = 0
         else: 
@@ -179,7 +179,7 @@ class ManagementAddressTLV(TLV):
 
         See `TLV.__repr__()` for more information.
         """
-        # TODO: Implement
+        
         return "ManagementAddressTLV(" + repr(self.subtype) + ", " + repr(self.value) + ", " + repr(self.oid) + ")"
 
     @staticmethod
@@ -191,14 +191,13 @@ class ManagementAddressTLV(TLV):
 
         Raises a `ValueError` if the provided TLV contains errors (e.g. has the wrong type).
         """
-        # TODO: Implement
+        
         work_data = bytearray(data)
         
         # check type
         type = work_data[0]
         
-        # TODO: check length
-
+        
         # Management Address String length
         ma_strlength = work_data[2] -2
 

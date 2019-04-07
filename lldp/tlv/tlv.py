@@ -79,7 +79,7 @@ class TLV(object):
         Params:
             data (bytes or bytearray): The packed TLV
         """
-        # TODO: Implement
+        
         return NotImplemented
 
     @staticmethod
@@ -123,7 +123,6 @@ class TLV(object):
                 Otherwise, this should be set to None
         """
 
-        # TODO: changed this from None. No TODO was here before so not sure if permitted
         self.type = type
         self.subtype = subtype
         self.value = value_bytes

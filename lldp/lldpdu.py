@@ -59,7 +59,6 @@ class LLDPDU:
         `ValueError`. Conditions for specific TLVs are detailed in each TLV's class description.
         """
 
-        # TODO: Implement error checks
         # LLDPDU must fit into an ethernet frame
         if len(bytes(self)) + len(bytes(tlv)) > 1500:
             raise ValueError
@@ -106,7 +105,6 @@ class LLDPDU:
 
         An LLDPDU is complete when it includes at least the mandatory TLVs (Chassis ID, Port ID, TTL).
         """
-        # # TODO: Implement
 
         # Check length (quicker than checking if every mandatory TLV is there)
         if self.__len__() < 4:
@@ -142,7 +140,7 @@ class LLDPDU:
         Raises a value error if the provided TLV is of unknown type. Apart from that validity checks are left to the
         subclass.
         """
-        # TODO: Implement
+        
         notEnd = True
         work_data = bytearray(data)
         currentID = 0

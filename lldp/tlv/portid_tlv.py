@@ -107,7 +107,7 @@ class PortIdTLV(TLV):
                 Network Address -> ip_address
                 Otherwise       -> str
         """
-        # TODO: Implement
+        
         self.type = TLV.Type.PORT_ID
         self.subtype = subtype
         self.value = id
@@ -119,7 +119,7 @@ class PortIdTLV(TLV):
         This method must return bytes. Returning a bytearray will raise a TypeError.
         See `TLV.__bytes__()` for more information.
         """
-        # TODO: Implement
+        
         firstByteInt = (2 << 1) + (self.__len__()  >> 7)
         secondByteInt = self.__len__()
         byteval = bytes([firstByteInt]) + bytes([secondByteInt])
@@ -146,7 +146,7 @@ class PortIdTLV(TLV):
         This method must return an int. Returning anything else will raise a TypeError.
         See `TLV.__len__()` for more information.
         """
-        # TODO: Implement
+        
         # Note: This does not include subtype length
 
         if (self.subtype == PortIdTLV.Subtype.MAC_ADDRESS):
@@ -167,7 +167,7 @@ class PortIdTLV(TLV):
 
         See `TLV.__repr__()` for more information.
         """
-        # TODO: Implement
+        
         return "PortIdTLV(" + repr(self.subtype) + ", " + repr(self.value) + ")"
         # DONE
 
@@ -180,7 +180,7 @@ class PortIdTLV(TLV):
 
         Raises a `ValueError` if the provided TLV contains errors (e.g. has the wrong type).
         """
-        # TODO: Implement
+       
         work_data = bytearray(data)
 
         # check type

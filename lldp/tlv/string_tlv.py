@@ -27,7 +27,7 @@ class PortDescriptionTLV(TLV):
     """
 
     def __init__(self, description: str):
-        # TODO: Implement
+        
         self.type = TLV.Type.PORT_DESCRIPTION
         self.value = description
         # DONE
@@ -38,7 +38,7 @@ class PortDescriptionTLV(TLV):
         This method must return bytes. Returning a bytearray will raise a TypeError.
         See `TLV.__bytes__()` for more information.
         """
-        # TODO: Implement
+        
         firstByteInt = (4 << 1) + (self.__len__()  >> 7)
         secondByteInt = self.__len__()
         byteval = bytes([firstByteInt]) + bytes([secondByteInt])
@@ -54,7 +54,7 @@ class PortDescriptionTLV(TLV):
         This method must return an int. Returning anything else will raise a TypeError.
         See `TLV.__len__()` for more information.
         """
-        # TODO: Implement
+        
         # Note: Maybe use __sizeof__ ?
         return len(self.value.encode())
         # DONE
@@ -64,7 +64,7 @@ class PortDescriptionTLV(TLV):
 
         See `TLV.__repr__()` for more information.
         """
-        # TODO: Implement
+        
         return "StringTLV(" + repr(self.value) + ")"
         # DONE
 
@@ -77,7 +77,7 @@ class PortDescriptionTLV(TLV):
 
         Raises a `ValueError` if the provided TLV contains errors (e.g. has the wrong type).
         """
-        # TODO: Implement
+        
         work_data = bytearray(data)
 
         # check type
@@ -117,7 +117,7 @@ class SystemDescriptionTLV(TLV):
     """
 
     def __init__(self, description: str):
-        # TODO: Implement
+        
         self.type = TLV.Type.SYSTEM_DESCRIPTION
         self.value = description
 
@@ -127,7 +127,7 @@ class SystemDescriptionTLV(TLV):
         This method must return bytes. Returning a bytearray will raise a TypeError.
         See `TLV.__bytes__()` for more information.
         """
-        # TODO: Implement
+        
         firstByteInt = (6 << 1) + (self.__len__()  >> 7)
         secondByteInt = self.__len__()
         byteval = bytes([firstByteInt]) + bytes([secondByteInt])
@@ -142,7 +142,7 @@ class SystemDescriptionTLV(TLV):
         This method must return an int. Returning anything else will raise a TypeError.
         See `TLV.__len__()` for more information.
         """
-        # TODO: Implement
+        
         return len(self.value.encode())
 
     def __repr__(self):
@@ -150,7 +150,7 @@ class SystemDescriptionTLV(TLV):
 
         See `TLV.__repr__()` for more information.
         """
-        # TODO: Implement
+        
         return "SystemDescriptionTLV(" + repr(self.value) + ")"
 
     @staticmethod
@@ -162,7 +162,7 @@ class SystemDescriptionTLV(TLV):
 
         Raises a `ValueError` if the provided TLV contains errors (e.g. has the wrong type).
         """
-        # TODO: Implement
+        
         work_data = bytearray(data)
 
         # check type
@@ -202,7 +202,7 @@ class SystemNameTLV(TLV):
     """
 
     def __init__(self, name: str):
-        # TODO: Implement
+       
         self.type = TLV.Type.SYSTEM_NAME
         self.value = name
 
@@ -212,7 +212,7 @@ class SystemNameTLV(TLV):
         This method must return bytes. Returning a bytearray will raise a TypeError.
         See `TLV.__bytes__()` for more information.
         """
-        # TODO: Implement
+        
         firstByteInt = (5 << 1) 
         secondByteInt = self.__len__()
         byteval = bytes([firstByteInt]) + bytes([secondByteInt])
@@ -227,7 +227,7 @@ class SystemNameTLV(TLV):
         This method must return an int. Returning anything else will raise a TypeError.
         See `TLV.__len__()` for more information.
         """
-        # TODO: Implement
+        
         return len(self.value.encode())
 
     def __repr__(self):
@@ -235,7 +235,7 @@ class SystemNameTLV(TLV):
 
         See `TLV.__repr__()` for more information.
         """
-        # TODO: Implement
+        
         return "SystemNameTLV("+  repr(self.value) + ")"
 
     @staticmethod
@@ -247,7 +247,7 @@ class SystemNameTLV(TLV):
 
         Raises a `ValueError` if the provided TLV contains errors (e.g. has the wrong type).
         """
-        # TODO: Implement
+        
         work_data = bytearray(data)
 
         # test type

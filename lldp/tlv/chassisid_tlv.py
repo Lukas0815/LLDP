@@ -128,7 +128,7 @@ class ChassisIdTLV(TLV):
         See `TLV.__bytes__()` for more information.
         """
 
-        # TODO: Implement
+       
         firstByteInt = (1 << 1) 
         secondByteInt = self.__len__()
         byteval = bytes([firstByteInt]) + bytes([secondByteInt])
@@ -157,7 +157,7 @@ class ChassisIdTLV(TLV):
         This method must return an int. Returning anything else will raise a TypeError.
         See `TLV.__len__()` for more information.
         """
-        # TODO: Implement
+        
         # Note: Subtype included with +1 because it always takes 8bit/1byte
 
         if (self.subtype == ChassisIdTLV.Subtype.MAC_ADDRESS):
@@ -177,7 +177,7 @@ class ChassisIdTLV(TLV):
 
         See `TLV.__repr__()` for more information.
         """
-        # TODO: Implement
+        
         return "ChassisIdTLV(" + repr(self.subtype) + ", " + repr(self.value) + ")"
         # DONE
 
@@ -202,7 +202,7 @@ class ChassisIdTLV(TLV):
         highestBit = work_data[0] & 1
         length = (highestBit << 9) + work_data[1]
         # length = work_data[1]
-        # TODO: check if length is actually valid or not
+        
         if length != len(work_data[2:]):
             raise ValueError
         

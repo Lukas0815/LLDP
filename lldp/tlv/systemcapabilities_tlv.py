@@ -87,7 +87,7 @@ class SystemCapabilitiesTLV(TLV):
             supported (int): Bitmap of supported capabilities
             enabled (int): Bitmap of enabled capabilities
         """
-        # TODO: Implement
+        
         self.type = TLV.Type.SYSTEM_CAPABILITIES
         self.value = (supported << 16) + enabled
         self.supported_int = supported
@@ -102,7 +102,7 @@ class SystemCapabilitiesTLV(TLV):
         This method must return bytes. Returning a bytearray will raise a TypeError.
         See `TLV.__bytes__()` for more information.
         """
-        # TODO: Implement
+        
         firstByteInt = (7 << 1)
         secondByteInt = self.__len__()
         byteval = firstByteInt.to_bytes(1, byteorder='big', signed=False) + secondByteInt.to_bytes(1, byteorder='big', signed=False)
@@ -118,7 +118,7 @@ class SystemCapabilitiesTLV(TLV):
         This method must return an int. Returning anything else will raise a TypeError.
         See `TLV.__len__()` for more information.
         """
-        # TODO: Implement
+        
         return 4
         # DONE
 
@@ -127,7 +127,7 @@ class SystemCapabilitiesTLV(TLV):
 
         See `TLV.__repr__()` for more information.
         """
-        # TODO: Implement
+        
         return "SystemCapabilitiesTLV(" + repr(self.value) + ")"
         # DONE
 
@@ -140,7 +140,7 @@ class SystemCapabilitiesTLV(TLV):
 
         Raises a `ValueError` if the provided TLV contains errors (e.g. has the wrong type).
         """
-        # TODO: Implement
+        
         work_data = bytearray(data)
 
         # test overal length
@@ -169,7 +169,7 @@ class SystemCapabilitiesTLV(TLV):
 
         Multiple capabilities should be ORed together.
         """
-        # TODO: Implement
+        
         return True if (capabilities == (capabilities & self.supported_int)) else False
     
 
@@ -178,7 +178,7 @@ class SystemCapabilitiesTLV(TLV):
 
         Multiple capabilities should be ORed together.
         """
-        # TODO: Implement
+        
         combined = capabilities & self.enabled_int
         if (capabilities == combined):
             return True
