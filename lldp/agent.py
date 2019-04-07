@@ -80,9 +80,10 @@ class LLDPAgent:
                     work_data = bytearray(data)
                     destination = work_data[:6]
                     source = work_data[6:12]
-                    print("source: ", source)
+                    # NOTE: this raises ValueError when executing main.py
                     if not (source in [b'\x01\x80\xc2\x00\x00\x0e', b'\x01\x80\xc2\x00\x00\x00', b'\x01\x80\xc2\x00\x00\x03']):
                         raise ValueError
+                    print("reached this")
                     etherType = work_data[12:14]
                     if etherType != b'\x88\xcc':
                         raise ValueError
