@@ -47,6 +47,8 @@ class OrganizationallySpecificTLV(TLV):
         self.subtype = subtype
         if type(value) == str:
             self.value = value.encode()
+        elif type(value) == int:
+            self.value = bytes([value])
         else:
             self.value = value
         # DONE
@@ -114,4 +116,4 @@ class OrganizationallySpecificTLV(TLV):
         #value
         value = work_data[6:]
 
-        return OrganizationallySpecificTLV(oui, subtype, value)
+        return OrganizationallySpecificTLV(oui, bytes([subtype]), value)

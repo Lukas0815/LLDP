@@ -23,7 +23,7 @@ class ManagementAddressTLV(TLV):
          0               1               2               3               4
         +-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-...-+-+-+-+~
         |             |                 |  Management   |  Management   |   Management    |
-        |     0x1     |      Length     |    Address    |    Address    |     Address     |
+        |     0x10    |      Length     |    Address    |    Address    |     Address     |
         |             |                 | String Length |    Subtype    | (m=1-31 octets) |
         +-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-...-+-+-+-+~
 
@@ -130,11 +130,11 @@ class ManagementAddressTLV(TLV):
 
         # TODO: Implement
         # get type and length right (first 2 bytes)
-        firstByteInt = (1 << 1) + (self.__len__()  >> 7)
+        firstByteInt = (8 << 1)
         secondByteInt = self.__len__()
         byteval = bytes([firstByteInt]) + bytes([secondByteInt])
         #add Management Address string length (of byterep?)
-        byteval += bytes([len(self.value.packed)])
+        byteval += bytes([len(self.value.packed)+1])
         # add Management Address Subtype
         if self.value.version == 4:
             byteval += bytes([1])
@@ -143,9 +143,9 @@ class ManagementAddressTLV(TLV):
         # add Management address
         byteval += self.value.packed
         # add Interface Numbering subtype
-        byteval += bytes([self.subtype])    # maybe .value() needed?
+        byteval += bytes([self.subtype])   
         # add Interface Number
-        byteval += bytes([self.ifnmbr])
+        byteval += self.ifnmbr.to_bytes(4, byteorder='big', signed=False)
         # oid length
         byteval += bytes([0]) if self.oid is None else bytes([len(self.oid)])
         # add oid
@@ -200,28 +200,30 @@ class ManagementAddressTLV(TLV):
         # TODO: check length
 
         # Management Address String length
-        ma_strlength = work_data[2] -1
+        ma_strlength = work_data[2] -2
 
         # Management Address Subtype
         ma_subtype = work_data[3]
 
         # Management Address
-        ma_address = ip_address(addr2Str(ma_subtype, work_data[4:5+ma_strlength-1]))
+        ma_address = ip_address(addr2Str(ma_subtype, work_data[4:5+ma_strlength]))
 
         # Interface Numbering Subtype
         insubtype = work_data[5+ma_strlength]
 
         # Interface Number
-        ifacenmbr = work_data[6+ma_strlength:6+ma_strlength]
+        ifacenmbr = work_data[6+ma_strlength:10+ma_strlength]
 
         #OID String length
-        try:
-            oid_strlength = work_data[10+ma_strlength]
+        
+        oid_strlength = work_data[10+ma_strlength]
 
+        if oid_strlength != 0:
             # OID
             oid = work_data[11+ma_strlength:]
-        except IndexError:
+        else:
             oid = None
+
 
         return ManagementAddressTLV(ma_address, ifacenmbr, insubtype, oid)
 

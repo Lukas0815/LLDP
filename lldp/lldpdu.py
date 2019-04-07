@@ -61,30 +61,43 @@ class LLDPDU:
 
         # TODO: Implement error checks
         # LLDPDU must fit into an ethernet frame
-        if len(bytes()) > 1500:
+        if len(bytes(self)) + len(bytes(tlv)) > 1500:
             raise ValueError
 
         # Check if already EoLLDPDU regardless of Type of tlv => Not working at all, due to out of range error => len() does not do what expected
-        # if self.__getitem__(self.__len__()-1).get_type() == TLV.Type.END_OF_LLDPDU:
-        #    raise ValueError
+        if tlv.type == TLV.Type.END_OF_LLDPDU:
+            if self.__len__() < 3:
+                # print("end but not long enough lldp")
+                raise ValueError
+            if self.__tlvs[len(self.__tlvs)-1].type == TLV.Type.END_OF_LLDPDU:
+                # print("eolldpdu is not end")
+                raise ValueError 
         
         # Checks for ChassisID
-        # if tlv.get_type() == TLV.Type.CHASSIS_ID:
-        #     # Trying to add ChassisID but not first item to be added? WAIT, thats illegal
-        #     if self.__len__() != 0:
-        #         raise ValueError
-        #
-        # # Checks for PortID
-        # if tlv.get_type() == TLV.Type.PORT_ID:
-        #     # PortID must be second item in LLDPDU
-        #     if self.__len__() != 1:
-        #         raise ValueError
-        #
-        # # Checks for TTL
-        # if tlv.get_type() == TLV.Type.TTL:
-        #     # TTL must be third item in LLDPDU
-        #     if self.__len__() != 2:
-        #         raise ValueError
+        if tlv.type == TLV.Type.CHASSIS_ID:
+            # Trying to add ChassisID but not first item to be added? WAIT, thats illegal
+            if self.__len__() != 0:
+                # print("wrong location of chassis")
+                raise ValueError
+        
+        # Checks for PortID
+        if tlv.type == TLV.Type.PORT_ID:
+            # PortID must be second item in LLDPDU
+            if self.__len__() != 1:
+                # print("wrong location of portid")
+                raise ValueError
+        
+        # Checks for TTL
+        if tlv.type == TLV.Type.TTL:
+            # TTL must be third item in LLDPDU
+            if self.__len__() != 2:
+                # print("wrong location of ttl")
+                raise ValueError
+        
+        if not (tlv.type in [TLV.Type.END_OF_LLDPDU, TLV.Type.CHASSIS_ID, TLV.Type.PORT_ID, TLV.Type.TTL]):
+            # other tlvs must be after chassis, port and ttl
+            if self.__len__() < 3:
+                raise ValueError
 
         self.__tlvs.append(tlv)
 
@@ -100,20 +113,20 @@ class LLDPDU:
             return False
 
         #Check for ChassisID
-        # if self.__getitem__(0).get_type() != TLV.Type.CHASSIS_ID:
-        #     return False
+        if self.__getitem__(0).type != TLV.Type.CHASSIS_ID:
+            return False
 
         # # Check PortID position
-        # if self.__getitem__(1).get_type() != TLV.Type.PORT_ID:
-        #     return False
+        if self.__getitem__(1).type != TLV.Type.PORT_ID:
+            return False
 
         # # Check TTL position
-        # if self.__getitem__(2).get_type() != TLV.Type.TTL:
-        #     return False
+        if self.__getitem__(2).type != TLV.Type.TTL:
+            return False
 
         # # Check last TLV to be the EoLLDPDU
-        # if self.__getitem__(self.__len__()-1) != TLV.Type.END_OF_LLDPDU:
-        #     return False
+        if self.__getitem__(self.__len__()-1).type != TLV.Type.END_OF_LLDPDU:
+            return False
 
         return True
         # DONE    
@@ -130,4 +143,21 @@ class LLDPDU:
         subclass.
         """
         # TODO: Implement
-        return NotImplemented
+        notEnd = True
+        work_data = bytearray(data)
+        currentID = 0
+        tlvs = []
+        while notEnd:
+            type = work_data[currentID] >> 1
+            if not (type in [0,1,2,3,4,5,6,7,8,127]):
+                print("type: ", type)
+                raise ValueError
+            if type == TLV.Type.END_OF_LLDPDU:
+                notEnd = False    
+
+            length = work_data[currentID+1]
+            tlvs.append(TLV.from_bytes(work_data[currentID:currentID+length+2]))
+            currentID += length+2
+
+        return LLDPDU(*tlvs)
+

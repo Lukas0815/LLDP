@@ -111,7 +111,10 @@ class ChassisIdTLV(TLV):
                 Network Address -> ip_address
                 Otherwise       -> str
         """
-       
+        if subtype == ChassisIdTLV.Subtype.MAC_ADDRESS and len(id) != 6:
+            raise ValueError
+        if not (0 < subtype < 8):
+            raise ValueError
         
         self.type = TLV.Type.CHASSIS_ID
         self.subtype = subtype
@@ -126,12 +129,11 @@ class ChassisIdTLV(TLV):
         """
 
         # TODO: Implement
-        #byteval = bytes([1]) + bytes([self.__len__()])
         firstByteInt = (1 << 1) 
         secondByteInt = self.__len__()
         byteval = bytes([firstByteInt]) + bytes([secondByteInt])
         # add subtype
-        byteval += bytes([self.subtype.value])
+        byteval += bytes([self.subtype])
         # add the value
         if self.subtype == ChassisIdTLV.Subtype.MAC_ADDRESS:
             # value is MAC in bytes
@@ -201,6 +203,8 @@ class ChassisIdTLV(TLV):
         length = (highestBit << 9) + work_data[1]
         # length = work_data[1]
         # TODO: check if length is actually valid or not
+        if length != len(work_data[2:]):
+            raise ValueError
         
         # read the subtype
         subtype = work_data[2]
@@ -208,6 +212,7 @@ class ChassisIdTLV(TLV):
         if not (0 < subtype < 8):
             raise ValueError
         
+
         # process data
         if subtype == ChassisIdTLV.Subtype.MAC_ADDRESS:
             # if data is MAC address it is just bytes

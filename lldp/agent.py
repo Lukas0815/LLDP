@@ -37,7 +37,7 @@ class LLDPAgent:
         """
         if sock is None:
             # Open a socket suitable for transmitting LLDP frames.
-            self.socket = socket(socket.AF_PACKET, socket.SOCK_RAW, 0) # DONE
+            self.socket = socket.socket(socket.AF_PACKET, socket.SOCK_RAW, 768) # DONE
         else:
             self.socket = sock
 
@@ -80,7 +80,8 @@ class LLDPAgent:
                     work_data = bytearray(data)
                     destination = work_data[:6]
                     source = work_data[6:12]
-                    if source != b'\x01\x80\xc2\x00\x00\x0e':
+                    print("source: ", source)
+                    if not (source in [b'\x01\x80\xc2\x00\x00\x0e', b'\x01\x80\xc2\x00\x00\x00', b'\x01\x80\xc2\x00\x00\x03']):
                         raise ValueError
                     etherType = work_data[12:14]
                     if etherType != b'\x88\xcc':
@@ -90,6 +91,8 @@ class LLDPAgent:
                     # Instantiate LLDPDU object from raw bytes
                     # TODO: Implement
                     lldpdu = LLDPDU.from_bytes(raw_lldpdu)
+                    if not lldpdu.complete():
+                        raise ValueError
 
                     # Log contents
                     self.logger.log(str(lldpdu))
@@ -124,7 +127,7 @@ class LLDPAgent:
         tlvs.append(ChassisIdTLV(ChassisIdTLV.Subtype.MAC_ADDRESS, self.mac_address))
         tlvs.append(PortIdTLV(PortIdTLV.Subtype.INTERFACE_NAME, self.interface_name))
         tlvs.append(TTLTLV(60))
-        tlvs.append(EndOfLLDPDUTLV())
+        #tlvs.append(EndOfLLDPDUTLV())
         lldpdu = LLDPDU(*tlvs)
 
         # Construct Ethernet Frame

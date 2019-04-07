@@ -90,8 +90,11 @@ class SystemCapabilitiesTLV(TLV):
         # TODO: Implement
         self.type = TLV.Type.SYSTEM_CAPABILITIES
         self.value = (supported << 16) + enabled
-        self.supported = supported
-        self.enabled = enabled
+        self.supported_int = supported
+        self.enabled_int = enabled
+        if not self.supports(enabled):
+            raise ValueError
+
 
     def __bytes__(self):
         """Return the byte representation of the TLV.
@@ -158,8 +161,6 @@ class SystemCapabilitiesTLV(TLV):
             raise ValueError
         if (supported & enabled) != enabled:
             raise ValueError
-        print("supported: ", bin(supported))
-        print("enabled:   ", bin(enabled))
 
         return SystemCapabilitiesTLV(supported, enabled)
 
@@ -169,7 +170,7 @@ class SystemCapabilitiesTLV(TLV):
         Multiple capabilities should be ORed together.
         """
         # TODO: Implement
-        return capabilities == (capabilities & self.supported)
+        return True if (capabilities == (capabilities & self.supported_int)) else False
     
 
     def enabled(self, capabilities: int):
@@ -178,4 +179,8 @@ class SystemCapabilitiesTLV(TLV):
         Multiple capabilities should be ORed together.
         """
         # TODO: Implement
-        return capabilities == (capabilities & self.enabled)
+        combined = capabilities & self.enabled_int
+        if (capabilities == combined):
+            return True
+        else:
+            return False

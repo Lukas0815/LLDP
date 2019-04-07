@@ -124,7 +124,7 @@ class PortIdTLV(TLV):
         secondByteInt = self.__len__()
         byteval = bytes([firstByteInt]) + bytes([secondByteInt])
         # add subtype
-        byteval += bytes([self.subtype.value])
+        byteval += bytes([self.subtype])
 
         # add value
         if self.subtype == PortIdTLV.Subtype.NETWORK_ADDRESS:
